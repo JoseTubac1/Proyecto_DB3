@@ -427,6 +427,50 @@ GROUP BY
 ORDER BY 
     total_vendido DESC;
 
+-- VISTAS FALTANTES
+-- Vista para Reporte de Inventario
+CREATE VIEW ReporteInventario AS
+SELECT P.id_producto, P.nombre, P.stock, P.precio_unitario, (P.stock * P.precio_unitario) AS valor_total, A.nombre AS almacen
+FROM Producto P
+JOIN Almacen A ON P.id_almacen = A.id_almacen;
+
+-- Vista para Reporte por Ubicación
+CREATE VIEW ReportePorUbicacion AS
+SELECT A.nombre AS almacen, GROUP_CONCAT(P.nombre SEPARATOR ', ') AS productos
+FROM Producto P
+JOIN Almacen A ON P.id_almacen = A.id_almacen
+GROUP BY A.nombre;
+
+-- Vista para Reporte de Stock Bajo
+CREATE VIEW ReporteStockBajo AS
+SELECT * FROM Producto WHERE stock < 10;
+
+-- Vista para Reporte por Rango de Precio
+CREATE VIEW ReportePorPrecio AS
+SELECT * FROM Producto WHERE precio_unitario BETWEEN 100 AND 500;
+
+-- Vista para Reporte de Transacciones
+CREATE VIEW ReporteTransacciones AS
+SELECT V.id_venta, P.nombre AS producto, V.cantidad, V.precio_unitario, (V.cantidad * V.precio_unitario) AS valor_total, V.id_transaccion
+FROM ProductosVendidos V
+JOIN Producto P ON V.id_producto = P.id_producto;
+
+-- Vista para Productos por Ubicación
+CREATE VIEW ProductosPorUbicacion AS
+SELECT A.nombre AS ubicacion, P.nombre AS producto, P.stock
+FROM Producto P
+JOIN Almacen A ON P.id_almacen = A.id_almacen;
+
+
+SELECT * FROM ReporteInventario;
+SELECT * FROM ReportePorUbicacion;
+SELECT * FROM ReporteStockBajo;
+SELECT * FROM ReportePorPrecio;
+SELECT * FROM ReporteTransacciones;
+SELECT * FROM ProductosPorUbicacion;
+
+
+
 
 -- GESTION DE USUARIOS Y SEGURIDAD
 
