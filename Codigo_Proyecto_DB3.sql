@@ -279,8 +279,293 @@ CALL AgregarStock(1, 50);  -- Agregar 50 unidades al producto con id_producto = 
 
 
 
+-- Partición Horizontal
+CREATE TABLE TransaccionParticionada (
+    id_transaccion INT NOT NULL,
+    fecha DATETIME NOT NULL,
+    total DECIMAL(10,2) NOT NULL,
+    id_usuario INT NOT NULL,
+    PRIMARY KEY (id_transaccion, fecha)
+)
+PARTITION BY RANGE (MONTH(fecha)) (
+    PARTITION p_enero VALUES LESS THAN (2),
+    PARTITION p_febrero VALUES LESS THAN (3),
+    PARTITION p_marzo VALUES LESS THAN (4),
+    PARTITION p_abril VALUES LESS THAN (5),
+    PARTITION p_mayo VALUES LESS THAN (6),
+    PARTITION p_junio VALUES LESS THAN (7),
+    PARTITION p_julio VALUES LESS THAN (8),
+    PARTITION p_agosto VALUES LESS THAN (9),
+    PARTITION p_septiembre VALUES LESS THAN (10),
+    PARTITION p_octubre VALUES LESS THAN (11),
+    PARTITION p_noviembre VALUES LESS THAN (12),
+    PARTITION p_diciembre VALUES LESS THAN (13)
+);
+
+INSERT INTO TransaccionParticionada (id_transaccion, fecha, total, id_usuario) VALUES
+(1, '2025-03-01 10:00:00', 200.00, 1),
+(2, '2025-03-02 11:30:00', 300.00, 2),
+(3, '2025-03-03 12:15:00', 500.00, 3),
+(4, '2025-03-04 14:00:00', 150.00, 4),
+(5, '2025-03-05 09:45:00', 250.00, 5),
+(6, '2025-03-06 13:00:00', 120.00, 6),
+(7, '2025-03-07 16:30:00', 100.00, 7),
+(8, '2025-03-08 17:45:00', 450.00, 8),
+(9, '2025-03-09 08:00:00', 350.00, 9),
+(10, '2025-03-10 19:00:00', 400.00, 10);
+
+SELECT *
+FROM TransaccionParticionada
+WHERE MONTH(fecha) = 3;
+
+SELECT *, PARTITION_NAME
+FROM information_schema.partitions
+WHERE TABLE_NAME = 'TransaccionParticionada'
+AND TABLE_SCHEMA = 'gestion_inventarios';
 
 
+-- Partición Vertical
+CREATE TABLE Producto_General (
+  id_producto INT PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL,
+  precio_unitario DECIMAL(10,2) NOT NULL
+);
+
+CREATE TABLE Producto_Detalle (
+  id_producto INT PRIMARY KEY,
+  descripcion TEXT,
+  stock INT NOT NULL,
+  id_almacen INT,
+  FOREIGN KEY (id_almacen) REFERENCES Almacen(id_almacen)
+);
+
+INSERT INTO Producto_General (id_producto, nombre, precio_unitario)
+SELECT id_producto, nombre, precio_unitario FROM Producto;
+
+INSERT INTO Producto_Detalle (id_producto, descripcion, stock, id_almacen)
+SELECT id_producto, descripcion, stock, id_almacen FROM Producto;
+/*
+OPCIONAL SI SE QUIERE ELIMINAR LA TABLA ORIGINAL
+DROP TABLE Producto;
+*/
+SELECT 
+  pg.id_producto,
+  pg.nombre,
+  pg.precio_unitario,
+  pd.descripcion,
+  pd.stock,
+  pd.id_almacen
+FROM 
+  Producto_General pg
+JOIN 
+  Producto_Detalle pd ON pg.id_producto = pd.id_producto;
+
+
+
+-- Replica
+CREATE USER 'replicator'@'%' IDENTIFIED BY 'replicator_password';
+GRANT REPLICATION SLAVE ON *.* TO 'replicator'@'%';
+FLUSH PRIVILEGES;
+
+-- Verificar estado del binlog
+SHOW MASTER STATUS;
+
+/* Queda pendiente la replica o se puede hacer de la siguiente manera:
+
+	En el servidor maestro, puedes generar un volcado (dump) de la base de datos con el siguiente comando:
+    mysqldump -u usuario -p gestion_inventarios > backup.sql
+
+	Luego, en el servidor esclavo (o en otro servidor), puedes restaurar la base de datos:
+    mysql -u usuario -p gestion_inventarios < backup.sql
+
+*/
+
+
+-- Reporte de las transacciones por cada usuario
+SELECT 
+    t.id_transaccion, 
+    t.fecha, 
+    t.total, 
+    u.nombre AS usuario
+FROM 
+    Transaccion t
+JOIN 
+    Usuario u ON t.id_usuario = u.id_usuario
+WHERE 
+    t.fecha BETWEEN '2025-03-01' AND '2025-03-10'
+    AND t.total > 100
+ORDER BY 
+    t.fecha DESC;
+    
+-- Vista de reporte agrupado que muestra el total de ventas por usuario
+CREATE VIEW reporte_ventas_por_usuario AS
+SELECT 
+    u.nombre AS usuario, 
+    SUM(t.total) AS total_ventas
+FROM 
+    Transaccion t
+JOIN 
+    Usuario u ON t.id_usuario = u.id_usuario
+GROUP BY 
+    u.id_usuario
+ORDER BY 
+    total_ventas DESC;
+
+SELECT * FROM reporte_ventas_por_usuario;
+
+
+-- Reporte de Productos vendidos
+SELECT 
+    p.nombre AS producto, 
+    SUM(pv.cantidad) AS total_vendido
+FROM 
+    Producto p
+JOIN 
+    ProductosVendidos pv ON p.id_producto = pv.id_producto
+GROUP BY 
+    p.id_producto
+ORDER BY 
+    total_vendido DESC;
+
+-- VISTAS FALTANTES
+-- Vista para Reporte de Inventario
+CREATE VIEW ReporteInventario AS
+SELECT P.id_producto, P.nombre, P.stock, P.precio_unitario, (P.stock * P.precio_unitario) AS valor_total, A.nombre AS almacen
+FROM Producto P
+JOIN Almacen A ON P.id_almacen = A.id_almacen;
+
+-- Vista para Reporte por Ubicación
+CREATE VIEW ReportePorUbicacion AS
+SELECT A.nombre AS almacen, GROUP_CONCAT(P.nombre SEPARATOR ', ') AS productos
+FROM Producto P
+JOIN Almacen A ON P.id_almacen = A.id_almacen
+GROUP BY A.nombre;
+
+-- Vista para Reporte de Stock Bajo
+CREATE VIEW ReporteStockBajo AS
+SELECT * FROM Producto WHERE stock < 10;
+
+-- Vista para Reporte por Rango de Precio
+CREATE VIEW ReportePorPrecio AS
+SELECT * FROM Producto WHERE precio_unitario BETWEEN 100 AND 500;
+
+-- Vista para Reporte de Transacciones
+CREATE VIEW ReporteTransacciones AS
+SELECT V.id_venta, P.nombre AS producto, V.cantidad, V.precio_unitario, (V.cantidad * V.precio_unitario) AS valor_total, V.id_transaccion
+FROM ProductosVendidos V
+JOIN Producto P ON V.id_producto = P.id_producto;
+
+-- Vista para Productos por Ubicación
+CREATE VIEW ProductosPorUbicacion AS
+SELECT A.nombre AS ubicacion, P.nombre AS producto, P.stock
+FROM Producto P
+JOIN Almacen A ON P.id_almacen = A.id_almacen;
+
+
+SELECT * FROM ReporteInventario;
+SELECT * FROM ReportePorUbicacion;
+SELECT * FROM ReporteStockBajo;
+SELECT * FROM ReportePorPrecio;
+SELECT * FROM ReporteTransacciones;
+SELECT * FROM ProductosPorUbicacion;
+
+
+
+
+-- GESTION DE USUARIOS Y SEGURIDAD
+
+CREATE TABLE IF NOT EXISTS `Roles` (
+  `id_rol` INT AUTO_INCREMENT PRIMARY KEY,
+  `nombre` VARCHAR(50) NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS `Permisos` (
+  `id_permiso` INT AUTO_INCREMENT PRIMARY KEY,
+  `nombre` VARCHAR(50) NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS `Roles_Permisos` (
+  `id_rol` INT,
+  `id_permiso` INT,
+  PRIMARY KEY (`id_rol`, `id_permiso`),
+  FOREIGN KEY (`id_rol`) REFERENCES `Roles`(`id_rol`) ON DELETE CASCADE,
+  FOREIGN KEY (`id_permiso`) REFERENCES `Permisos`(`id_permiso`) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- Crear tabla de Usuarios con referencia a Roles
+ALTER TABLE `Usuario` ADD COLUMN `id_rol` INT NOT NULL;
+
+SELECT DISTINCT `id_rol`
+FROM `Usuario`
+WHERE `id_rol` NOT IN (SELECT `id_rol` FROM `Roles`);
+
+DELETE FROM `Usuario`
+WHERE `id_rol` NOT IN (SELECT `id_rol` FROM `Roles`);
+
+ALTER TABLE `Usuario`
+ADD FOREIGN KEY (`id_rol`) REFERENCES `Roles`(`id_rol`) ON DELETE CASCADE;
+
+
+INSERT INTO `Roles` (nombre) VALUES
+('Administrador'),
+('Vendedor'),
+('Supervisor');
+
+INSERT INTO `Permisos` (nombre) VALUES
+('Crear Producto'),
+('Actualizar Producto'),
+('Eliminar Producto'),
+('Ver Reportes'),
+('Gestionar Usuarios');
+
+
+-- Asignar permisos al rol Administrador
+INSERT INTO `Roles_Permisos` (id_rol, id_permiso) VALUES
+(1, 1), -- Crear Producto
+(1, 2), -- Actualizar Producto
+(1, 3), -- Eliminar Producto
+(1, 4), -- Ver Reportes
+(1, 5); -- Gestionar Usuarios
+
+-- Asignar permisos al rol Vendedor
+INSERT INTO `Roles_Permisos` (id_rol, id_permiso) VALUES
+(2, 4); -- Ver Reportes
+
+-- Asignar permisos al rol Supervisor
+INSERT INTO `Roles_Permisos` (id_rol, id_permiso) VALUES
+(3, 1), -- Crear Producto
+(3, 2), -- Actualizar Producto
+(3, 4); -- Ver Reportes
+
+-- Verificar los roles y permisos
+SELECT r.nombre AS rol, p.nombre AS permiso
+FROM `Roles` r
+JOIN `Roles_Permisos` rp ON r.id_rol = rp.id_rol
+JOIN `Permisos` p ON rp.id_permiso = p.id_permiso
+WHERE r.nombre = 'Administrador'; 
+
+SELECT r.nombre AS rol, p.nombre AS permiso
+FROM `Roles` r
+JOIN `Roles_Permisos` rp ON r.id_rol = rp.id_rol
+JOIN `Permisos` p ON rp.id_permiso = p.id_permiso
+WHERE r.nombre = 'Vendedor'; 
+
+SELECT r.nombre AS rol, p.nombre AS permiso
+FROM `Roles` r
+JOIN `Roles_Permisos` rp ON r.id_rol = rp.id_rol
+JOIN `Permisos` p ON rp.id_permiso = p.id_permiso
+WHERE r.nombre = 'Supervisor'; 
+
+
+-- Asignar rol de Administrador a un usuario con id_usuario = 1
+UPDATE `Usuario`
+SET `id_rol` = 1
+WHERE `id_usuario` = 1;
+
+-- Asignar rol de Vendedor a un usuario con id_usuario = 2
+UPDATE `Usuario`
+SET `id_rol` = 2
+WHERE `id_usuario` = 2;
 
 
 
