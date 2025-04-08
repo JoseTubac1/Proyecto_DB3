@@ -5,3 +5,6 @@ dist/
 # Ignore log files
 *.log
 
+# Ignore environment variable files
+.env
+
