@@ -41,7 +41,8 @@
 ### 5. Configuración del archivo `.env`
 1. Cree un archivo `.env` en el directorio raíz del backend `inventario-api`.
 2. Asegúrese de incluir las siguientes variables de entorno con los valores correspondientes a su configuración local:
-    ```plaintext
+    ```markdown
+    ```ini
     # Configuración de la base de datos MySQL
     DB_HOST=localhost
     DB_PORT=3306
@@ -54,13 +55,14 @@
 
     # Configuración del servidor
     PORT=3000
-
-    # Advertencia
-    # Asegúrese de no compartir este archivo `.env` públicamente, ya que contiene información sensible como contraseñas y configuraciones de conexión.
-    # Si sube el proyecto a un repositorio público, agregue el archivo `.env` al archivo `.gitignore` para evitar su inclusión en el control de versiones.
     ```
 
----
+    ---
+
+    > ⚠️ **Advertencia**:
+    > - Asegúrese de no compartir este archivo `.env` públicamente, ya que contiene información sensible como contraseñas y configuraciones de conexión.
+    > - Si sube el proyecto a un repositorio público, agregue el archivo `.env` al archivo `.gitignore` para evitar su inclusión en el control de versiones.
+    ```
 
 ### Notas adicionales
 - Asegúrese de que los servicios de MySQL y MongoDB estén en ejecución antes de iniciar el backend.
