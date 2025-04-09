@@ -1,243 +1,220 @@
 {
-	"info": {
-		"_postman_id": "3e0e4cc8-30e3-42a6-bd5a-3ed842850008",
-		"name": "Proyecto BD III",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "43766282"
-	},
-	"item": [
+	"id": "ac45e4a6-f232-4b7d-a4c6-ddb158a53542",
+	"name": "Proyecto BD III",
+	"timestamp": "2025-04-09T02:14:28.162Z",
+	"collection_id": "43766282-3e0e4cc8-30e3-42a6-bd5a-3ed842850008",
+	"folder_id": 0,
+	"environment_id": "0",
+	"totalPass": 0,
+	"delay": 0,
+	"persist": true,
+	"status": "finished",
+	"startedAt": "2025-04-09T02:14:24.084Z",
+	"totalFail": 0,
+	"results": [
 		{
+			"id": "317ba772-fda9-4009-87bd-c0ba7e9b0983",
 			"name": "Ingresar productos",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var template = `\r",
-							"<style type=\"text/css\">\r",
-							"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
-							"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
-							"    .tftable tr {background-color:#ffffff;}\r",
-							"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
-							"    .tftable tr:hover {background-color:#e0ffff;}\r",
-							"</style>\r",
-							"\r",
-							"<table class=\"tftable\" border=\"1\">\r",
-							"    <tr>\r",
-							"        <th>ID</th>\r",
-							"        <th>Nombre</th>\r",
-							"        <th>Descripción</th>\r",
-							"        <th>Precio Unitario</th>\r",
-							"        <th>Stock</th>\r",
-							"        <th>ID Almacén</th>\r",
-							"    </tr>\r",
-							"    \r",
-							"    {{#each response}}\r",
-							"        <tr>\r",
-							"            <td>{{id_producto}}</td>\r",
-							"            <td>{{nombre}}</td>\r",
-							"            <td>{{descripcion}}</td>\r",
-							"            <td>{{precio_unitario}}</td>\r",
-							"            <td>{{stock}}</td>\r",
-							"            <td>{{id_almacen}}</td>\r",
-							"        </tr>\r",
-							"    {{/each}}\r",
-							"</table>\r",
-							"`;\r",
-							"\r",
-							"function constructVisualizerPayload() {\r",
-							"    return {response: pm.response.json()}\r",
-							"}\r",
-							"\r",
-							"pm.visualizer.set(template, constructVisualizerPayload());"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
+			"url": "http://localhost:3000/api/productos",
+			"time": 52,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				52
 			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"nombre\": \"Cocas\",\r\n    \"descripcion\": \"Ya tu sabes\",\r\n    \"precio_unitario\": \"6\",\r\n    \"stock\": 1000,\r\n    \"id_almacen\": 3\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:3000/api/productos",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"productos"
-					]
-				}
-			},
-			"response": []
+			"allTests": [
+				{}
+			]
 		},
 		{
+			"id": "3e505889-a6f1-4f42-9c1c-163914142e43",
 			"name": "Reportes Inventario general",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/api/reportes/inventario",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"reportes",
-						"inventario"
-					]
-				}
+			"url": "http://localhost:3000/api/reportes/inventario",
+			"time": 19,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
 			},
-			"response": []
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				19
+			],
+			"allTests": [
+				{}
+			]
 		},
 		{
+			"id": "736f3935-21bc-4174-ad8f-c8bcb5d685c8",
 			"name": "Reporte por ubicacion",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/api/reportes/por-ubicacion",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"reportes",
-						"por-ubicacion"
-					]
-				}
+			"url": "http://localhost:3000/api/reportes/por-ubicacion",
+			"time": 11,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
 			},
-			"response": []
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				11
+			],
+			"allTests": [
+				{}
+			]
 		},
 		{
+			"id": "8b5dfc6e-db74-42c3-9b0b-8326ce5296de",
 			"name": "Reporte por stock bajo",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/api/reportes/stock-bajo",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"reportes",
-						"stock-bajo"
-					]
-				}
+			"url": "http://localhost:3000/api/reportes/stock-bajo",
+			"time": 12,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
 			},
-			"response": []
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				12
+			],
+			"allTests": [
+				{}
+			]
 		},
 		{
+			"id": "ffe06daa-53a8-48a7-a015-6c80cc66c57d",
 			"name": "Reporte por precio",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/api/reportes/por-precio",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"reportes",
-						"por-precio"
-					]
-				}
+			"url": "http://localhost:3000/api/reportes/por-precio",
+			"time": 11,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
 			},
-			"response": []
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				11
+			],
+			"allTests": [
+				{}
+			]
 		},
 		{
+			"id": "5d5c6eee-4e4e-450b-9511-c575a9b84117",
 			"name": "Reporte transacciones",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/api/reportes/productos-ubicacion-con-precio",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"reportes",
-						"productos-ubicacion-con-precio"
-					]
-				}
+			"url": "http://localhost:3000/api/reportes/productos-ubicacion-con-stock",
+			"time": 13,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
 			},
-			"response": []
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				13
+			],
+			"allTests": [
+				{}
+			]
 		},
 		{
-			"name": "Reporte por ubicacion con precio",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/api/reportes/transacciones",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"reportes",
-						"transacciones"
-					]
-				}
+			"id": "c17253ed-3dab-4f76-9f3d-a4e147466a08",
+			"name": "Reporte por ubicacion con stock",
+			"url": "http://localhost:3000/api/reportes/productos-ubicacion-con-stock",
+			"time": 12,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
 			},
-			"response": []
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				12
+			],
+			"allTests": [
+				{}
+			]
 		},
 		{
+			"id": "a35f193a-0ff0-4f75-9e79-d01e2d4f1fdf",
 			"name": "Cambios en productos",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"nombre\": \"Producto Actualizado\",\r\n  \"descripcion\": \"Nueva descripción\",\r\n  \"precio_unitario\": 150,\r\n  \"stock\": 20,\r\n  \"id_almacen\": 2\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:3000/api/productos/1",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"productos",
-						"1"
-					]
-				}
+			"url": "http://localhost:3000/api/productos/1",
+			"time": 30,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
 			},
-			"response": []
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				30
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "1791df0c-4667-42fb-a0b2-f536b2fcc133",
+			"name": "Eliminar producto",
+			"url": "http://localhost:3000/api/productos/3",
+			"time": 11,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				11
+			],
+			"allTests": [
+				{}
+			]
 		}
-	]
+	],
+	"count": 1,
+	"totalTime": 171,
+	"collection": {
+		"requests": [
+			{
+				"id": "317ba772-fda9-4009-87bd-c0ba7e9b0983",
+				"method": "POST"
+			},
+			{
+				"id": "3e505889-a6f1-4f42-9c1c-163914142e43",
+				"method": "GET"
+			},
+			{
+				"id": "736f3935-21bc-4174-ad8f-c8bcb5d685c8",
+				"method": "GET"
+			},
+			{
+				"id": "8b5dfc6e-db74-42c3-9b0b-8326ce5296de",
+				"method": "GET"
+			},
+			{
+				"id": "ffe06daa-53a8-48a7-a015-6c80cc66c57d",
+				"method": "GET"
+			},
+			{
+				"id": "5d5c6eee-4e4e-450b-9511-c575a9b84117",
+				"method": "GET"
+			},
+			{
+				"id": "c17253ed-3dab-4f76-9f3d-a4e147466a08",
+				"method": "GET"
+			},
+			{
+				"id": "a35f193a-0ff0-4f75-9e79-d01e2d4f1fdf",
+				"method": "PUT"
+			},
+			{
+				"id": "1791df0c-4667-42fb-a0b2-f536b2fcc133",
+				"method": "DELETE"
+			}
+		]
+	}
 }
