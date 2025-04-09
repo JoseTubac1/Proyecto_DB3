@@ -1,3 +1,6 @@
+# Video de Presentación
+https://youtu.be/mE10yDpriP4
+
 # Proyecto_DB3
 ## Guía para ejecutar el proyecto
 
